@@ -5,7 +5,7 @@ let remoteSketchInstance;
 
 const remoteSketch = (p) => {
   let x, y, w, h;
-  let base = [0];
+  let base = [0, 255, "red", "blue"];
   let cnv;
 
   p.getRemoteSize = function () {
@@ -52,6 +52,15 @@ const remoteSketch = (p) => {
     p.textFont("Courier New");
     if (container) {
       cnv.parent(container);
+
+      // Tooltip has pointer-events:none, so pressing the lens area hits #remote.
+      // Repaint on every press, including while siege is active.
+      container.addEventListener("pointerdown", (event) => {
+        if (event.button !== undefined && event.button !== 0) {
+          return;
+        }
+        p.paintRemoteScene();
+      });
     }
 
     p.paintRemoteScene();
