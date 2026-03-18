@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Tool caches
+node_modules/.cache/
+
+# OS files
+.DS_Store
