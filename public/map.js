@@ -1,5 +1,6 @@
 // https://editor.p5js.org/mrm029/sketches/rk8upjm9m
 // https://editor.p5js.org/jeffThompson/sketches/pTeiuK7PQ
+// https://editor.p5js.org/oliviaemlee/sketches/FcMv-gpmP
 
 let aerialSketchInstance;
 
@@ -58,6 +59,10 @@ const aerialSketch = (p) => {
   p.windowResized = function () {
     const { width, height } = p.getAerialSize();
     p.resizeCanvas(width, height);
+    // Don't repaint during siege to lock the scene
+    if (!window.siegeOn) {
+      p.paintAerialScene();
+    }
   };
 
   p.draw = function () {};

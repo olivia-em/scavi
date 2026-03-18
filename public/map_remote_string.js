@@ -23,15 +23,27 @@ const remoteStringSketch = (p) => {
     return sourceLines[p.floor(p.random(sourceLines.length))];
   };
 
-  p.loadSourceText = async function () {
-    const [structureResp, coinsResp] = await Promise.all([
-      fetch("/structure.txt"),
-      fetch("/coins.txt"),
-    ]);
+  p.fetchSourceFile = async function (path) {
+    const response = await fetch(path, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`failed to fetch ${path}: ${response.status}`);
+    }
 
+    const raw = await response.text();
+    const normalized = raw.trimStart().toLowerCase();
+
+    // Prevent parsing fallback HTML error pages as source text lines.
+    if (normalized.startsWith("<!doctype") || normalized.startsWith("<html")) {
+      throw new Error(`unexpected html response for ${path}`);
+    }
+
+    return raw;
+  };
+
+  p.loadSourceText = async function () {
     const [structureRaw, coinsRaw] = await Promise.all([
-      structureResp.text(),
-      coinsResp.text(),
+      p.fetchSourceFile("structure.txt"),
+      p.fetchSourceFile("coins.txt"),
     ]);
 
     const structureLines = structureRaw
@@ -44,6 +56,10 @@ const remoteStringSketch = (p) => {
       .filter(Boolean);
 
     sourceLines = [...structureLines, ...coinsLines];
+
+    if (!sourceLines.length) {
+      throw new Error("source text files are empty");
+    }
   };
 
   p.paintRemoteStringScene = function () {
@@ -53,7 +69,7 @@ const remoteStringSketch = (p) => {
     p.fill(255, 240);
     p.noStroke();
 
-    const totalStrings = p.floor(p.random(20, 101));
+    const totalStrings = p.floor(p.random(100, 201));
     for (let i = 0; i < totalStrings; i++) {
       const textLine = p.getRandomLine();
       const x = p.random(0, p.width);
@@ -94,7 +110,10 @@ const remoteStringSketch = (p) => {
   p.windowResized = function () {
     const { width, height } = p.getRemoteSize();
     p.resizeCanvas(width, height);
-    p.paintRemoteStringScene();
+    // Don't repaint during siege to lock the scene
+    if (!window.siegeOn) {
+      p.paintRemoteStringScene();
+    }
   };
 
   p.draw = function () {};
