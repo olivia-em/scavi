@@ -58,6 +58,10 @@ const aerialSketch = (p) => {
   p.windowResized = function () {
     const { width, height } = p.getAerialSize();
     p.resizeCanvas(width, height);
+    // Don't repaint during siege to lock the scene
+    if (!window.siegeOn) {
+      p.paintAerialScene();
+    }
   };
 
   p.draw = function () {};

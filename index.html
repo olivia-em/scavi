@@ -4,11 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scavi</title>
+    <link rel="icon" type="image/svg+xml" href="/scavi/favicon.svg" />
     <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.min.js"></script>
     <!-- https://jsfiddle.net/nzcage/nvrgbj5q/ -->
-    <link rel="stylesheet" crossorigin href="/scavi/assets/index-CQoJW81o.css">
+    <link rel="stylesheet" crossorigin href="/scavi/assets/index-ChIORYmt.css">
   </head>
-  <body>
+  <body class="preloading">
+    <div id="preloader" aria-live="polite">
+      <form id="preloader-form" autocomplete="off">
+        <span class="title">Scavi</span>
+        <label for="researcher-name">Researcher Name</label>
+        <input
+          id="researcher-name"
+          name="researcherName"
+          type="text"
+          required
+        />
+
+        <label for="research-date">Date</label>
+        <input id="research-date" name="researchDate" type="date" required />
+        <button class="action-button" type="submit">Submit</button>
+      </form>
+    </div>
+    <aside id="siege-panel" aria-live="polite">
+      <p class="title">Scavi</p>
+      <p>Researcher: <span id="siege-researcher">-</span></p>
+      <p>Date: <span id="siege-date">-</span></p>
+      <p>Time: <span id="siege-time">-</span></p>
+      <p>Siege: <span id="siege-elapsed">-</span></p>
+    </aside>
+    <div id="save-controls" aria-label="Save map controls">
+      <span>Capture Map</span>
+      <div class="capture-options">
+        <div class="option-group">
+          <select id="aerial-mode" aria-label="Aerial visibility">
+            <option value="with">with</option>
+            <option value="without">without</option>
+          </select>
+          <span>Aerial</span>
+        </div>
+        <div class="option-group">
+          <select id="excavation-mode" aria-label="Excavation visibility">
+            <option value="with">with</option>
+            <option value="without">without</option>
+          </select>
+          <span>Excavation</span>
+        </div>
+        <div class="option-group">
+          <select id="remote-mode" aria-label="Remote visibility">
+            <option value="with">with</option>
+            <option value="without">without</option>
+          </select>
+          <span>Remote</span>
+        </div>
+        <div class="option-group">
+          <select id="legend-mode" aria-label="Legend mode">
+            <option value="with">with</option>
+            <option value="without">without</option>
+          </select>
+          <span>Legend</span>
+        </div>
+      </div>
+      <button
+        id="capture-map-btn"
+        class="action-button"
+        type="button"
+        aria-label="Capture screenshot"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
+            fill="currentColor"
+          />
+          <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
     <div class="aerial">
       <script src="/scavi/map.js"></script>
       <div id="software">
@@ -263,13 +340,9 @@
     </div>
     <div id="remote" onmousemove="myFunction(event)" class="ground">
       <div id="tooltip"></div>
+      <div id="remote-overlay"></div>
       <script src="/scavi/map_remote.js"></script>
       <script src="/scavi/map_remote_string.js"></script>
-    </div>
-    <div class="seige">
-      <button onclick="seige()" id="seige" aria-pressed="false">
-        Seige: OFF
-      </button>
     </div>
     <script src="/scavi/script.js"></script>
   </body>

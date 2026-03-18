@@ -60,6 +60,10 @@ const remoteSketch = (p) => {
   p.windowResized = function () {
     const { width, height } = p.getRemoteSize();
     p.resizeCanvas(width, height);
+    // Don't repaint during siege to lock the scene
+    if (!window.siegeOn) {
+      p.paintRemoteScene();
+    }
   };
 
   p.draw = function () {};

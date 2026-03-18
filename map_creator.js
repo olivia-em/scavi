@@ -8,6 +8,7 @@ const levelSketch = (p) => {
   let base = [255, "red", "blue"];
   let cnv;
   let currentLayerIndex = 0; // 0-10 for layers 1-11
+  let hasUserTriggeredPaint = false;
 
   p.getLevelSize = function () {
     const levelContainer = document.querySelector(".level");
@@ -56,6 +57,7 @@ const levelSketch = (p) => {
   };
 
   p.paintLevelScene = function () {
+    hasUserTriggeredPaint = true;
     p.paintLayer(currentLayerIndex);
   };
 
@@ -75,7 +77,9 @@ const levelSketch = (p) => {
   p.windowResized = function () {
     const { width, height } = p.getLevelSize();
     p.resizeCanvas(width, height);
-    p.paintLevelScene();
+    if (hasUserTriggeredPaint) {
+      p.paintLevelScene();
+    }
   };
 
   p.draw = function () {};
