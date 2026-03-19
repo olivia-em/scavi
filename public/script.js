@@ -44,6 +44,92 @@ let submittedResearchDateText = "-";
 let submittedTimeText = "-";
 let submittedAtMs = null;
 let submittedSiegeElapsedText = "-";
+let plannedSiegeAtMs = null;
+let siegeStartedAtMs = null;
+let siegeCountdownIntervalId = null;
+
+function formatCountdownDuration(ms) {
+  const safeMs = Math.max(0, ms);
+  const totalSeconds = Math.floor(safeMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${formatTwoDigits(minutes)}:${formatTwoDigits(seconds)}`;
+}
+
+function ensureSiegeCountdownElement() {
+  let node = document.getElementById("siege-countdown");
+  if (node) {
+    return node;
+  }
+
+  node = document.createElement("div");
+  node.id = "siege-countdown";
+  node.setAttribute("aria-live", "polite");
+  node.style.display = "none";
+  node.textContent = "00:00";
+  document.body.appendChild(node);
+  return node;
+}
+
+function updateSiegeCountdownDisplay() {
+  const node = ensureSiegeCountdownElement();
+
+  if (
+    document.body.classList.contains("preloading") ||
+    siegeOn ||
+    !Number.isFinite(plannedSiegeAtMs)
+  ) {
+    node.style.display = "none";
+    return;
+  }
+
+  const msRemaining = Math.max(0, plannedSiegeAtMs - Date.now());
+  node.textContent = formatCountdownDuration(msRemaining);
+  node.style.display = "block";
+}
+
+function startSiegeCountdownTimer() {
+  if (siegeCountdownIntervalId !== null) {
+    window.clearInterval(siegeCountdownIntervalId);
+  }
+
+  updateSiegeCountdownDisplay();
+  siegeCountdownIntervalId = window.setInterval(
+    updateSiegeCountdownDisplay,
+    250,
+  );
+}
+
+function stopSiegeCountdownTimer() {
+  if (siegeCountdownIntervalId !== null) {
+    window.clearInterval(siegeCountdownIntervalId);
+    siegeCountdownIntervalId = null;
+  }
+
+  const node = document.getElementById("siege-countdown");
+  if (node) {
+    node.style.display = "none";
+  }
+}
+
+function syncReportContext() {
+  window.scaviReportContext = {
+    researcher: submittedResearcherName,
+    researchDate: submittedResearchDateText,
+    researchTime: submittedTimeText,
+    siegeElapsed: submittedSiegeElapsedText,
+    submittedAtMs,
+    plannedSiegeAtMs,
+    siegeStartedAtMs,
+    siegeOn,
+    legendMode: legendModeSelect ? legendModeSelect.value : null,
+    aerialMode: aerialModeSelect ? aerialModeSelect.value : null,
+    excavationMode: excavationModeSelect ? excavationModeSelect.value : null,
+    remoteMode: remoteModeSelect ? remoteModeSelect.value : null,
+  };
+}
+
+syncReportContext();
 
 function formatDateForDisplay(isoDate) {
   if (!isoDate) {
@@ -86,6 +172,8 @@ function updateSiegePanelInfo() {
   if (siegePanelElapsed) {
     siegePanelElapsed.textContent = submittedSiegeElapsedText;
   }
+
+  syncReportContext();
 }
 
 async function downloadCurrentMapView() {
@@ -119,6 +207,7 @@ if (aerialModeSelect) {
     if (aerial) {
       aerial.style.display = includeAerial ? "flex" : "none";
     }
+    syncReportContext();
   });
 }
 
@@ -128,6 +217,7 @@ if (excavationModeSelect) {
     if (level) {
       level.style.display = includeExcavation ? "flex" : "none";
     }
+    syncReportContext();
   });
 }
 
@@ -140,6 +230,7 @@ if (remoteModeSelect) {
     if (tooltip) {
       tooltip.style.visibility = includeRemote ? "visible" : "hidden";
     }
+    syncReportContext();
   });
 }
 
@@ -147,22 +238,56 @@ if (legendModeSelect) {
   legendModeSelect.addEventListener("change", () => {
     const includeLegend = legendModeSelect.value === "with";
     document.body.classList.toggle("legend-hidden", !includeLegend);
+    syncReportContext();
   });
+}
+
+function openCapturePanel() {
+  const saveControls = document.getElementById("save-controls");
+  document.body.classList.remove("screenshot-mode");
+
+  // Restore visibility of all sections when capture panel is reopened.
+  if (aerial) aerial.style.display = "";
+  if (level) level.style.display = "";
+  if (remote) remote.style.display = "";
+  if (tooltip) tooltip.style.visibility = "";
+  document.body.classList.remove("legend-hidden");
+  if (saveControls) {
+    saveControls.style.display = "";
+  }
+}
+
+function closeCapturePanel() {
+  if (!siegeOn) {
+    return;
+  }
+
+  const saveControls = document.getElementById("save-controls");
+  if (saveControls) {
+    saveControls.style.display = "none";
+  }
+
+  document.body.classList.add("screenshot-mode");
+}
+
+function toggleCapturePanel() {
+  const saveControls = document.getElementById("save-controls");
+  const panelHiddenInline =
+    !!saveControls && saveControls.style.display === "none";
+  const isClosed =
+    document.body.classList.contains("screenshot-mode") || panelHiddenInline;
+
+  if (isClosed) {
+    openCapturePanel();
+    return;
+  }
+
+  closeCapturePanel();
 }
 
 if (captureMapButton) {
   captureMapButton.addEventListener("click", () => {
-    if (!siegeOn) {
-      return;
-    }
-
-    const saveControls = document.getElementById("save-controls");
-    if (saveControls) {
-      saveControls.style.display = "none";
-    }
-
-    // Mark temporary capture state so Escape can restore the panel.
-    document.body.classList.add("screenshot-mode");
+    toggleCapturePanel();
   });
 }
 
@@ -243,6 +368,10 @@ function scheduleRandomSiegeTrigger() {
   const delayMs =
     MIN_SIEGE_DELAY_MS +
     Math.floor(Math.random() * (MAX_SIEGE_DELAY_MS - MIN_SIEGE_DELAY_MS + 1));
+
+  plannedSiegeAtMs = Date.now() + delayMs;
+  syncReportContext();
+  startSiegeCountdownTimer();
 
   randomSiegeTimerId = window.setTimeout(() => {
     randomSiegeTimerId = null;
@@ -635,6 +764,9 @@ function setSiegeState(nextState) {
   document.body.classList.toggle("siege-on", siegeOn);
 
   if (siegeOn) {
+    stopSiegeCountdownTimer();
+    siegeStartedAtMs = Date.now();
+    plannedSiegeAtMs = siegeStartedAtMs;
     if (submittedAtMs !== null) {
       submittedSiegeElapsedText = formatElapsedDuration(
         Date.now() - submittedAtMs,
@@ -663,6 +795,8 @@ function setSiegeState(nextState) {
       tooltip.classList.add("siege-collapsed");
     });
   } else {
+    siegeStartedAtMs = null;
+    updateSiegeCountdownDisplay();
     tooltip.classList.remove("siege-collapsed");
     if (!isRemotePointerDown) {
       tooltip.style.opacity = "0";
@@ -673,32 +807,13 @@ function setSiegeState(nextState) {
 
   level.scrollIntoView({ block: "start" });
   randomizeAfterLayout();
+  syncReportContext();
 }
 
 window.addEventListener("keydown", (event) => {
   const saveControls = document.getElementById("save-controls");
   const panelHiddenInline =
     !!saveControls && saveControls.style.display === "none";
-
-  if (
-    event.key === "Escape" &&
-    (document.body.classList.contains("screenshot-mode") || panelHiddenInline)
-  ) {
-    event.preventDefault();
-    document.body.classList.remove("screenshot-mode");
-
-    // Restore visibility of all sections
-    if (aerial) aerial.style.display = "";
-    if (level) level.style.display = "";
-    if (remote) remote.style.display = "";
-    if (tooltip) tooltip.style.visibility = "";
-    document.body.classList.remove("legend-hidden");
-    if (saveControls) {
-      saveControls.style.display = "";
-    }
-
-    return;
-  }
 
   if (event.repeat) {
     return;
@@ -710,6 +825,17 @@ window.addEventListener("keydown", (event) => {
     (target.isContentEditable ||
       ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName))
   ) {
+    return;
+  }
+
+  if (
+    (event.key === "x" || event.key === "X") &&
+    (siegeOn ||
+      document.body.classList.contains("screenshot-mode") ||
+      panelHiddenInline)
+  ) {
+    event.preventDefault();
+    toggleCapturePanel();
     return;
   }
 
