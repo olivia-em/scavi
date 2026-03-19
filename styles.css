@@ -286,6 +286,11 @@ input[type="checkbox"] {
 .map-slot input[type="checkbox"]:checked ~ .map-panel {
   display: block;
 }
+
+.map-slot input[type="checkbox"]:checked ~ .map-label {
+  display: none;
+}
+
 .map-slot .map-panel {
   display: none;
 }

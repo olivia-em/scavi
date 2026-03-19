@@ -31,6 +31,7 @@ let siegeOn = false;
 let lastPaintedLayerIndex = -1; // Global tracking of which layer is currently painted on canvas
 let highestUnlockedLayer = 1; // Only layer1 is draggable initially
 const paintedLayerIndexes = new Set(); // Each layer can paint only once
+const ENABLE_AUTO_SCROLL = false;
 let hasAutoScrolledUp = false;
 let hasAutoScrolledDown = false;
 let isAutoScrollLocked = false;
@@ -546,7 +547,11 @@ function onFirstWheelAutoScroll(event) {
   scrollToTargetAndUnlock(targetTop);
 }
 
-window.addEventListener("wheel", onFirstWheelAutoScroll, { passive: false });
+if (ENABLE_AUTO_SCROLL) {
+  window.addEventListener("wheel", onFirstWheelAutoScroll, {
+    passive: false,
+  });
+}
 
 function randomInt(max) {
   return Math.floor(Math.random() * (max + 1));
@@ -607,6 +612,24 @@ if (software && mapSlots.length > 0) {
           window.paintAerialScene();
         }
       }
+    });
+  });
+
+  mapSlots.forEach((slot) => {
+    const toggle = slot.querySelector('input[type="checkbox"]');
+    const panel = slot.querySelector(".map-panel");
+
+    if (!toggle || !panel) {
+      return;
+    }
+
+    panel.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a[href]")) {
+        return;
+      }
+
+      toggle.checked = !toggle.checked;
+      toggle.dispatchEvent(new Event("change", { bubbles: true }));
     });
   });
 }
