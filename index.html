@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/scavi/favicon.svg" />
     <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.min.js"></script>
     <!-- https://jsfiddle.net/nzcage/nvrgbj5q/ -->
-    <link rel="stylesheet" crossorigin href="/scavi/assets/index-D4dvLusf.css">
+    <link rel="stylesheet" crossorigin href="/scavi/assets/index-zWvq9WX7.css">
   </head>
   <body class="preloading">
     <div id="preloader" aria-live="polite">
@@ -65,26 +65,25 @@
           <span>Legend</span>
         </div>
       </div>
-      <button
-        id="capture-map-btn"
-        class="action-button"
-        type="button"
-        aria-label="Capture screenshot"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-          focusable="false"
+      <div class="option-group">
+        <button
+          id="generate-report-btn"
+          class="action-button report-button"
+          type="button"
+          aria-label="Generate random report"
         >
-          <path
-            d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
-            fill="currentColor"
-          />
-          <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
-        </svg>
-      </button>
+          Generate Report
+        </button>
+        <button
+          id="capture-map-btn"
+          class="action-button"
+          type="button"
+          aria-label="Open or close capture panel"
+        >
+          x
+        </button>
+        <span>Open/Close Key</span>
+      </div>
     </div>
     <div class="aerial">
       <script src="/scavi/map.js"></script>
@@ -383,10 +382,21 @@
     </div>
     <div id="remote" onmousemove="myFunction(event)" class="ground">
       <div id="tooltip"></div>
-      <div id="remote-overlay"></div>
+      <div id="remote-overlay">
+        <div class="artifact">
+          <a
+            class="artifactlink"
+            target="_blank"
+            href="artifacts/coins/Calciati_01.txt"
+            ><h1>()</h1></a
+          >
+        </div>
+      </div>
       <script src="/scavi/map_remote.js"></script>
       <script src="/scavi/map_remote_string.js"></script>
     </div>
+    <script src="/scavi/tracking.js"></script>
     <script src="/scavi/script.js"></script>
+    <script src="/scavi/report.js"></script>
   </body>
 </html>

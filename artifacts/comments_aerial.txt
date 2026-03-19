@@ -1,0 +1,14 @@
+// what remains of the structure
+// the place remains
+// empty spaces
+// reimagine what is gone
+// areas here and there
+let fields = [];
+let walls = [];
+let roads = [];
+let buildings = [];
+// community after the seige 
+// after the seige
+// map the top layer
+// aerial overview
+console.log(post_deprecation)

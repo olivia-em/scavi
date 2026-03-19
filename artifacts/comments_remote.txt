@@ -1,7 +1,7 @@
 // this is the structure
 // this is the plan
 // place remains
-// cover things left behind
+// cover the things left behind
 // underneath layers here and here
 let potteryshards = [];
 let cremations = [];
