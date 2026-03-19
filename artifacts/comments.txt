@@ -1,0 +1,16 @@
+// this is the structure
+// this is the plan
+// place remains
+// cover things left behind
+// underneath layers here and here
+let potteryshards = [];
+let cremations = [];
+let walls = [];
+let buildings = [];
+let burials = [];
+let statues = [];
+// a community before the seige 
+// before the seige
+// beneath the layers
+// remote sensing 
+console.log(before_deprecation)

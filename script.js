@@ -586,6 +586,11 @@ function makeLayerDraggable(layer) {
   };
 
   layer.addEventListener("pointerdown", (e) => {
+    // Allow native link interaction (click/new tab) instead of starting drag.
+    if (e.target instanceof Element && e.target.closest("a[href]")) {
+      return;
+    }
+
     if (layerNum > highestUnlockedLayer) {
       return;
     }
