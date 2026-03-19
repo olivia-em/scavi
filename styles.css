@@ -194,6 +194,29 @@ div#software {
   overflow: hidden;
 }
 
+.artifact {
+  position: fixed;
+  translate: -50% -50%;
+  top: calc(50% - 5px);
+  left: calc(50% - 5px);
+  width: 20px;
+  height: fit-content;
+  color: white;
+  z-index: 1;
+  font-size: 14px;
+  /* background-color: black; */
+}
+
+a.artifactlink {
+  color: white;
+  text-decoration: none;
+}
+
+a:visited.artifactlink {
+  color: white;
+  pointer-events: none;
+}
+
 label {
   color: white;
   font-size: 20px;

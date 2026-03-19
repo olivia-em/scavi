@@ -1,6 +1,8 @@
 ##### Resources
 
-- [coins.txt](https://www.magnagraecia.nl/coins/Area_III_map/Motya_map/Motya.html)
+- [coins - 1](https://www.magnagraecia.nl/coins/Area_III_map/Motya_map/Motya.html)
+
+- [coins - 2](https://www.wildwinds.com/coins/greece/sicily/motya/t.html)
 
 - [Sketch Inspo](https://editor.p5js.org/mrm029/sketches/rk8upjm9m)
 

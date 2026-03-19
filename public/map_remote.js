@@ -20,6 +20,7 @@ const remoteSketch = (p) => {
   };
 
   p.paintRemoteScene = function () {
+    p.clear();
     let totalPitCount = p.random(100, 300);
     let totalWallCount = p.random(100, 300);
     let totalShardCount = p.random(1000, 3000);
